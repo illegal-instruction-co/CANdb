@@ -12,17 +12,6 @@ function(candb_add_test test_name)
   endif()
 endfunction()
 
-try_compile(
-  HAS_STD_FILESYSTEM "${CMAKE_BINARY_DIR}/temp" "${CMAKE_SOURCE_DIR}/cmake/has_filesystem.cpp"
-  CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
-)
-
-if(NOT HAS_STD_FILESYSTEM)
-    message(STATUS "Tests required C++17 and std::filesystem")
-    return()
-endif()
-
-
 add_library(test_helper STATIC test_helper.cpp)
 target_link_libraries(test_helper PUBLIC spdlog)
 target_compile_definitions(test_helper PUBLIC DBC_DIR="${CMAKE_CURRENT_SOURCE_DIR}/dbc/")
