@@ -3,7 +3,6 @@
 
 #include "dbc_parser_data.hpp"
 #include "dbcparser.h"
-#include "log.hpp"
 
 using strings = std::vector<std::string>;
 

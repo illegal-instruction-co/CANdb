@@ -3,7 +3,6 @@
 
 #include "dbc_parser_data.hpp"
 #include "dbcparser.h"
-#include "log.hpp"
 
 TEST(ValuesTableTest, val_table_single)
 {

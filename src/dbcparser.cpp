@@ -1,5 +1,4 @@
 #include "dbcparser.h"
-#include "log.hpp"
 #include "parser.hpp"
 #include "parsererror.hpp"
 #include "stringutils.h"
@@ -63,10 +62,7 @@ tl::expected<peg::parser, CANdb::ParserError> loadPegParser()
 {
     peg::parser pegParser;
 
-    pegParser.log = [](size_t l, size_t k, const std::string& s) { cdb_error("Parser log {}:{} {}", l, k, s); };
-
     if (!pegParser.load_grammar(dbc_grammar.c_str(), dbc_grammar.length())) {
-        cdb_error("Unable to parse grammar");
         return tl::make_unexpected(CANdb::make_error_code(CANdb::ErrorType::GrammarNotCorrent));
     }
 
@@ -81,7 +77,7 @@ CANdb::CanDbOrError parse(peg::parser& pegParser, const std::string& data)
 
     const auto noTabsData = dos2unix(data);
     const auto traceEnter = [](const peg::Ope&, const char* name, std::size_t, const peg::SemanticValues&,
-                                const peg::Context&, const std::any&) { cdb_trace(" Parsing {} ", name); };
+                                const peg::Context&, const std::any&) {};
     const auto traceLeave = [](const peg::Ope&, const char*, std::size_t, const peg::SemanticValues&,
                                 const peg::Context&, const std::any&, std::size_t) {};
     pegParser.enable_trace(traceEnter, traceLeave);
@@ -108,7 +104,6 @@ CANdb::CanDbOrError parse(peg::parser& pegParser, const std::string& data)
 
     pegParser["ns"] = [&can_db, &idents](const peg::SemanticValues& sv) {
         can_db.symbols = to_vector(idents);
-        cdb_debug("Found symbols {}", sv.token());
         idents.clear();
     };
 
@@ -122,45 +117,32 @@ CANdb::CanDbOrError parse(peg::parser& pegParser, const std::string& data)
 
     pegParser["bs"] = [](const peg::SemanticValues&) {
         // TODO: Implement me
-        cdb_warn("TAG BS Not implemented");
     };
 
     pegParser["ev"] = [](const peg::SemanticValues& sv) {
         // TODO: Implement me
-        cdb_warn("TAG EV Not implemented");
-        cdb_debug("Found environment variable [ev] {}", sv.token());
     };
 
-    pegParser["sign"] = [&signs](const peg::SemanticValues& sv) {
-        cdb_debug("Found sign {}", sv.token());
-        signs.push_back(std::string{ sv.token() });
-    };
+    pegParser["sign"] = [&signs](const peg::SemanticValues& sv) { signs.push_back(std::string{ sv.token() }); };
 
-    pegParser["sig_sign"] = [&sig_sign](const peg::SemanticValues& sv) {
-        cdb_debug("Found sig_sign {}", sv.token());
-        sig_sign.push_back(std::string{ sv.token() });
-    };
+    pegParser["sig_sign"]
+        = [&sig_sign](const peg::SemanticValues& sv) { sig_sign.push_back(std::string{ sv.token() }); };
 
     pegParser["bu"] = [&can_db, &idents](const peg::SemanticValues& sv) {
         can_db.ecus = to_vector(idents);
-        cdb_debug("Found ecus [bu] {}", sv.token());
         idents.clear();
     };
 
     pegParser["bu_sl"] = [&can_db, &idents](const peg::SemanticValues& sv) {
         can_db.ecus = to_vector(idents);
-        cdb_debug("Found ecus [bu] {}", sv.token());
         idents.clear();
     };
 
     pegParser["number"] = [&numbers](const peg::SemanticValues& sv) {
         try {
-            cdb_debug("Found number {}", sv.token());
             auto number = std::stod(std::string{ sv.token() });
-            cdb_trace("Found number {}", number);
             numbers.push_back(number);
         } catch (const std::exception& ex) {
-            cdb_error("Unable to parse {} to a number from {}", sv.token(), sv.name());
         }
     };
 
@@ -184,7 +166,6 @@ CANdb::CanDbOrError parse(peg::parser& pegParser, const std::string& data)
     std::string muxName;
     std::vector<CANsignal> signals;
     pegParser["message"] = [&can_db, &numbers, &signals, &idents, &mux, &muxNdx, &muxName](const peg::SemanticValues&) {
-        cdb_debug("Found a message {} signals = {}", idents.size(), signals.size());
         if (numbers.size() < 2 || idents.size() < 2) {
             return;
         }
@@ -194,7 +175,6 @@ CANdb::CanDbOrError parse(peg::parser& pegParser, const std::string& data)
         auto name = take_back(idents);
 
         const CANmessage msg{ static_cast<std::uint32_t>(id), name, static_cast<std::uint32_t>(dlc), ecu };
-        cdb_debug("Found a message with id = {}", msg.id);
         can_db.messages[msg] = signals;
         signals.clear();
         numbers.clear();
@@ -204,10 +184,8 @@ CANdb::CanDbOrError parse(peg::parser& pegParser, const std::string& data)
         muxName = "";
     };
 
-    pegParser["signal"] = [&idents, &numbers, &phrases, &signals, &sig_sign, &ecu_tokens, &mux, &muxNdx,
-                              &muxName](const peg::SemanticValues& sv) {
-        cdb_debug("Found signal {}", sv.token());
-
+    pegParser["signal"] = [&idents, &numbers, &phrases, &signals, &sig_sign, &ecu_tokens, &mux, &muxNdx, &muxName](
+                              const peg::SemanticValues& sv) {
         const std::vector<std::string> receiver{ ecu_tokens.begin(), ecu_tokens.end() };
         auto unit = take_back(phrases);
 
@@ -224,7 +202,6 @@ CANdb::CanDbOrError parse(peg::parser& pegParser, const std::string& data)
             sigMuxName = muxName;
             sigMuxNdx = static_cast<std::uint8_t>(muxNdx);
             muxNdx = -1;
-            cdb_debug("Signal: muxName {}, muxNdx {}", muxName, sigMuxNdx);
         }
 
         CANsignal::ByteOrder byteOrder = (take_back(numbers) == 0) ? CANsignal::Motorola : CANsignal::Intel;

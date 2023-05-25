@@ -1,6 +1,5 @@
 #include <candb.h>
 #include <iostream>
-#include <log.hpp>
 #include <memory>
 #include <regex>
 
@@ -9,9 +8,6 @@ std::shared_ptr<spdlog::logger> kDefaultLogger;
 int main()
 {
     using namespace CANdb;
-
-    kDefaultLogger = spdlog::stdout_color_mt("cdb");
-    kDefaultLogger->set_level(spdlog::level::debug);
 
     // std::unique_ptr<ParserInterface> parser(Parser::create(Format::DBC));
 

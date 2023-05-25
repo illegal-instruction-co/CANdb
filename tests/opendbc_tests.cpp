@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 #include "dbcparser.h"
-#include "log.hpp"
 #include "opendbc_tests_expected_data.hpp"
 #include "test_helper.hpp"
 

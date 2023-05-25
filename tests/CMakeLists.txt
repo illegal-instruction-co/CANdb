@@ -13,9 +13,7 @@ function(candb_add_test test_name)
 endfunction()
 
 add_library(test_helper STATIC test_helper.cpp)
-target_link_libraries(test_helper PUBLIC spdlog)
 target_compile_definitions(test_helper PUBLIC DBC_DIR="${CMAKE_CURRENT_SOURCE_DIR}/dbc/")
-
 
 target_compile_features(test_helper PUBLIC cxx_std_17)
 target_compile_definitions(test_helper PUBLIC HAS_STD_FILESYSTEM)
