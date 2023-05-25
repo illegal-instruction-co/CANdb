@@ -1,5 +1,3 @@
-add_subdirectory(termcolor)
-add_subdirectory(gtest)
 set(CXXOPTS_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(CXXOPTS_BUILD_TESTS OFF CACHE BOOL "")
 add_subdirectory(cxxopts)
