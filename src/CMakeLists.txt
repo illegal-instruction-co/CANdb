@@ -21,4 +21,3 @@ target_include_directories(
 )
 
 target_link_libraries(CANdb PUBLIC cpp-peglib tl-expected)
-

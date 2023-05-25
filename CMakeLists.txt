@@ -7,6 +7,8 @@ option(CANDB__WITH_TESTS "Build with test" OFF)
 option(CANDB__WITH_TOOLS "Build example dbc tools" OFF)
 option(CANDB__WITH_CONAN "3rdParty with conan " OFF)
 
+include_directories(3rdParty/expected)
+
 if(CANDB__WITH_CONAN)
     include(cmake/Conan.cmake)
 else()
