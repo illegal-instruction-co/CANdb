@@ -11,7 +11,6 @@ if(CANDB__WITH_CONAN)
     include(cmake/Conan.cmake)
 else()
     add_subdirectory(3rdParty)
-    add_library(fmt INTERFACE)
 endif()
 
 
