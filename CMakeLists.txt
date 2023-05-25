@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.8.0)
 project(CANdb CXX C)
 
 option(CANDB__WITH_COVERAGE "Build with coverage" OFF)
-option(CANDB__WITH_TESTS "Build with test" ON)
-option(CANDB__WITH_TOOLS "Build example dbc tools" ON)
+option(CANDB__WITH_TESTS "Build with test" OFF)
+option(CANDB__WITH_TOOLS "Build example dbc tools" OFF)
 option(CANDB__WITH_CONAN "3rdParty with conan " OFF)
 
 if(CANDB__WITH_CONAN)
