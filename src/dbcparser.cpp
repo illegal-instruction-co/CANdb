@@ -140,8 +140,21 @@ CANdb::CanDbOrError parse(peg::parser& pegParser, const std::string& data)
 
     pegParser["number"] = [&numbers](const peg::SemanticValues& sv) {
         try {
-            auto number = std::stod(std::string{ sv.token() });
-            numbers.push_back(number);
+            auto numberStr = std::string(sv.token());
+
+            // Check if the number string contains a comma
+            if (numberStr.find(',') != std::string::npos) {
+                // Parse the number as a pair of values
+                size_t commaPos = numberStr.find(',');
+                auto firstNumber = std::stod(numberStr.substr(1, commaPos - 1));
+                auto secondNumber = std::stod(numberStr.substr(commaPos + 1, numberStr.length() - commaPos - 2));
+                numbers.push_back(firstNumber);
+                numbers.push_back(secondNumber);
+            } else {
+                // Parse the number as a single value
+                auto number = std::stod(numberStr);
+                numbers.push_back(number);
+            }
         } catch (const std::exception& ex) {
         }
     };
